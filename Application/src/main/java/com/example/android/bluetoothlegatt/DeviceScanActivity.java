@@ -118,15 +118,6 @@ public class DeviceScanActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
-//        if (!mBluetoothAdapter.isEnabled()) {
-//            if (!mBluetoothAdapter.isEnabled()) {
-//                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-//            }
-//        }
-
         // 권한설정 관련 코드
         // 마시멜로우 호환 문제 때문에 아래 코드로 대체함
         boolean isGranted = grantBluetoothPermission();
@@ -142,6 +133,7 @@ public class DeviceScanActivity extends ListActivity {
             return;
         }
 
+        // https://academy.realm.io/kr/posts/android-marshmellow-permission/ 참고
         if (isGranted) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
