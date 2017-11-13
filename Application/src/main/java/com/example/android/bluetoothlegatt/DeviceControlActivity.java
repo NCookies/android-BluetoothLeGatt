@@ -42,6 +42,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * For a given BLE device, this Activity provides the user interface to connect, display data,
@@ -312,9 +313,15 @@ public class DeviceControlActivity extends Activity {
         return intentFilter;
     }
 
+    public void onClickWrite0(View v){
+        if(mBluetoothLeService != null) {
+            mBluetoothLeService.writeCustomCharacteristic("d0");
+        }
+    }
+
     public void onClickWrite(View v){
         if(mBluetoothLeService != null) {
-            mBluetoothLeService.writeCustomCharacteristic(0xAA);
+            mBluetoothLeService.writeCustomCharacteristic("d1");
         }
     }
 

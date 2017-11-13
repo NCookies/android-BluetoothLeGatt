@@ -7,8 +7,15 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Write Char"
+        android:text="d0"
         android:id="@+id/button2"
+        android:onClick="onClickWrite0" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="d1"
+        android:id="@+id/button23"
         android:onClick="onClickWrite" />
 
     <Button
