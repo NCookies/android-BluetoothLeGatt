@@ -324,10 +324,4 @@ public class DeviceControlActivity extends Activity {
             mBluetoothLeService.writeCustomCharacteristic("d1");
         }
     }
-
-    public void onClickRead(View v){
-        if(mBluetoothLeService != null) {
-            mBluetoothLeService.readCustomCharacteristic();
-        }
-    }
 }
