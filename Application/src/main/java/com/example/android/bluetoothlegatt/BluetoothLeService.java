@@ -16,6 +16,7 @@
 
 package com.example.android.bluetoothlegatt;
 
+import android.app.Activity;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -29,8 +30,11 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,6 +52,8 @@ public class BluetoothLeService extends Service {
     private String mBluetoothDeviceAddress;
     private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
+
+    private Activity activity;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
@@ -159,6 +165,9 @@ public class BluetoothLeService extends Service {
                                             BluetoothGattCharacteristic characteristic) {
             broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
             Log.d(TAG, "# onCharacteristicChanged: " +  characteristic.toString());
+
+            // 값을 write한 후 변경된 값을 read함
+            readCustomCharacteristic();
         }
     };
 
@@ -411,7 +420,7 @@ public class BluetoothLeService extends Service {
             return false;
         }
     }
-`
+
     public void readCustomCharacteristic() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
@@ -428,8 +437,30 @@ public class BluetoothLeService extends Service {
         byte[] data = mReadCharacteristic.getValue();
         Log.d(TAG, Integer.toString(data.length));
         try {
-            String str = new String(data, "UTF-8");
+            final String str = new String(data, "UTF-8");
             Log.d(TAG, str);
+
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    activity.runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(getApplicationContext(), "hello world", Toast.LENGTH_SHORT).show();
+//                        }
+//                    });
+//                }
+//            });
+
+            Handler handler = new Handler(Looper.getMainLooper());
+
+            handler.post(new Runnable() {
+
+                @Override
+                public void run() {
+                    Toast.makeText(BluetoothLeService.this.getApplicationContext(), str, Toast.LENGTH_LONG).show();
+                }
+            });
 
         } catch (IOException e) {
             e.printStackTrace();

@@ -18,12 +18,12 @@
         android:id="@+id/button23"
         android:onClick="onClickWrite" />
 
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Read Char"
-        android:id="@+id/button"
-        android:onClick="onClickRead" />
+    <!--<Button-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Read Char"-->
+        <!--android:id="@+id/button"-->
+        <!--android:onClick="onClickRead" />-->
 
     <TextView
         android:layout_width="wrap_content"
