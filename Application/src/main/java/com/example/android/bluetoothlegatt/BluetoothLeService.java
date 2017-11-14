@@ -32,6 +32,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -108,7 +109,6 @@ public class BluetoothLeService extends Service {
             }
 
             BluetoothGattCharacteristic characteristic = mBluetoothGattService.getCharacteristic(UUID_NRF_TX_CHARACTERISTIC);
-
             if (isNotificationCharacteristic(characteristic)) {
                 setCharacteristicNotification(characteristic, true);
             }
@@ -354,6 +354,7 @@ public class BluetoothLeService extends Service {
             return;
         }
         mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+
         BluetoothGattDescriptor desc = characteristic.getDescriptor(UUID.fromString(SampleGattAttributes.NRF_TX_DESCRIPTOR));
         desc.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
         mBluetoothGatt.writeDescriptor(desc);
@@ -410,7 +411,7 @@ public class BluetoothLeService extends Service {
             return false;
         }
     }
-
+`
     public void readCustomCharacteristic() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
             Log.w(TAG, "BluetoothAdapter not initialized");
@@ -424,6 +425,16 @@ public class BluetoothLeService extends Service {
         }
         /*get the read characteristic from the service*/
         BluetoothGattCharacteristic mReadCharacteristic = mCustomService.getCharacteristic(UUID.fromString(SampleGattAttributes.NRF_TX_CHARACTERISTIC));
+        byte[] data = mReadCharacteristic.getValue();
+        Log.d(TAG, Integer.toString(data.length));
+        try {
+            String str = new String(data, "UTF-8");
+            Log.d(TAG, str);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
         boolean isReadable = isReadableCharacteristic(mReadCharacteristic);
         if (isReadable) {
@@ -432,8 +443,6 @@ public class BluetoothLeService extends Service {
             }
             System.out.println(mReadCharacteristic.getValue());
         }
-
-        byte[] data = mReadCharacteristic.getValue();
     }
 
     public void writeCustomCharacteristic(String value) {

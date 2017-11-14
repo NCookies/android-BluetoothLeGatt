@@ -30,7 +30,7 @@ public class SampleGattAttributes {
     public static String NRF_RX_CHARACTERISTIC          = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
 
     public static String NRF_TX_DESCRIPTOR              = "00002902-0000-1000-8000-00805f9b34fb";
-
+//    public static String NRF_TX_DESCRIPTOR              = "0x2902";
     static {
         // Sample Services.
         attributes.put("0000180d-0000-1000-8000-00805f9b34fb", "Heart Rate Service");
