@@ -102,6 +102,12 @@ public class DeviceScanActivity extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // 권한 허가 여부를 봐야 함
+        boolean isGranted = grantBluetoothPermission(true);
+        if (!isGranted) {
+            return false;
+        }
+
         switch (item.getItemId()) {
             case R.id.menu_scan:
                 mLeDeviceListAdapter.clear();
@@ -118,10 +124,6 @@ public class DeviceScanActivity extends ListActivity {
     protected void onResume() {
         super.onResume();
 
-        // 권한설정 관련 코드
-        // 마시멜로우 호환 문제 때문에 아래 코드로 대체함
-        boolean isGranted = grantBluetoothPermission();
-
         // BLE 세팅
         final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -133,42 +135,57 @@ public class DeviceScanActivity extends ListActivity {
             return;
         }
 
+        // 권한설정 관련 코드
+        // 마시멜로우 호환 문제 때문에 아래 코드로 대체함
+        // 여기서 사용자가 권한을 허가하기 전에 기다리지 않고 바로 다음으로 넘어감
+        boolean isGranted = grantBluetoothPermission(false);
+
+        // Initializes list view adapter.
+        mLeDeviceListAdapter = new LeDeviceListAdapter();
+        setListAdapter(mLeDeviceListAdapter);
+
         // https://academy.realm.io/kr/posts/android-marshmellow-permission/ 참고
         if (isGranted) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
             }
-
-            // Initializes list view adapter.
-            mLeDeviceListAdapter = new LeDeviceListAdapter();
-            setListAdapter(mLeDeviceListAdapter);
-            scanLeDevice(true);
+        } else {
+            // isGranted(false) : 사용자가 권한을 거부하거나 설정되어 있지 않을 때
+            // 튕기는 이유는 무엇일까? -> list adapter가 설정되어 있지 않아 claerUI() 함수에서 오류 발생
         }
     }
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
-    private boolean grantBluetoothPermission() {
+    private boolean grantBluetoothPermission(boolean scan) {
         // 마시멜로우 버전 이상일 때
         if (Build.VERSION.SDK_INT >= 23) {
             int accessCoarseLocation = checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
             int accessFineLocation   = checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
+            // 권한이 이미 허가되어있을때
             if (accessCoarseLocation == PackageManager.PERMISSION_GRANTED
                     || accessFineLocation == PackageManager.PERMISSION_GRANTED) {
-                // 권한이 이미 허가되어있을 때
                 return true;
-            } else {
-                // 권한이 없을 때
+            } else {    // 권한이 없을 때
                 if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION) ||
                         shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // 사용자가 권한 요청을 거절했을 때 토스트 등을 띄어 사용자에게 필요성을 알려야 함
                     // Show an explanation to the user *asynchronously* -- don't block
                     // this thread waiting for the user's response! After the user
                     // sees the explanation, try again to request the permission.
+                    Toast.makeText(DeviceScanActivity.this.getApplicationContext(),
+                            "앱의 기능을 사용하기 위해서는 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+                    if (scan) {
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                    }
                     return false;
                 } else {
-                    // 사용자가 권한을 요청한 적이 없음. 권한 요청 시도.
+                    // 사용자에게 권한을 요청한 적이 없음. 권한 요청 시도.
+                    // asynchronous 함수이기 때문에 튕겨버림
+                    // 동기로 작동하게 할 수는 없음
+                    // 여기서 바로 false 를 리턴해버림
                     requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                             Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
                     return false;
@@ -188,11 +205,14 @@ public class DeviceScanActivity extends ListActivity {
 
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // 권한 허가
                     // 해당 권한을 사용해서 작업을 진행할 수 있습니다
+                    // 전역 boolean 변수 이용?
+                    scanLeDevice(true);
                 } else {
-                    // 권한 거부
                     // 사용자가 해당권한을 거부했을때 해주어야 할 동작을 수행합니다
+                    // 토스트 등을 띄어 사용자에게 권한의 필요성을 알려야 함
+
+                    scanLeDevice(false);
                 }
                 return;
         }
