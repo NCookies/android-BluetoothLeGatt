@@ -66,6 +66,19 @@
                   android:text="@string/no_data"
                   android:textSize="18sp"/>
     </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="d0"
+        android:id="@+id/button2"
+        android:onClick="onClickWrite0" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="d1"
+        android:id="@+id/button23"
+        android:onClick="onClickWrite" />
     <ExpandableListView android:id="@+id/gatt_services_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
