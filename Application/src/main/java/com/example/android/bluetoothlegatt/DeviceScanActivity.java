@@ -174,9 +174,9 @@ public class DeviceScanActivity extends ListActivity {
                     // Show an explanation to the user *asynchronously* -- don't block
                     // this thread waiting for the user's response! After the user
                     // sees the explanation, try again to request the permission.
-                    Toast.makeText(DeviceScanActivity.this.getApplicationContext(),
-                            "앱의 기능을 사용하기 위해서는 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+
                     if (scan) {
+                    // 추후에 권한 요청의 호출 시점을 변경해야 함(UI에 따라 달라짐)
                         requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
                     }
@@ -211,6 +211,8 @@ public class DeviceScanActivity extends ListActivity {
                 } else {
                     // 사용자가 해당권한을 거부했을때 해주어야 할 동작을 수행합니다
                     // 토스트 등을 띄어 사용자에게 권한의 필요성을 알려야 함
+                    Toast.makeText(DeviceScanActivity.this.getApplicationContext(),
+                            "앱의 기능을 사용하기 위해서는 위치 권한이 필요합니다.", Toast.LENGTH_LONG).show();
 
                     scanLeDevice(false);
                 }
